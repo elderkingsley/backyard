@@ -1,0 +1,40 @@
+version: '3'
+services:
+  #PHP Service
+  backyard-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: digitalocean1.com/php
+    container_name: backyard-app
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: backyard-app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - blackfirenet
+
+  #Nginx Service
+  backyard-webserver:
+    image: nginx:alpine
+    container_name: backyard-webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - '7220:80'
+    volumes:
+      - ./:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - blackfirenet
+
+#Docker Networks
+networks:
+  blackfirenet:
+    external: true
+
